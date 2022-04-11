@@ -1,3 +1,11 @@
+## 0.6.0 
+
+IMPROVEMENTS:
+* Now supports secret substitution for entire auth_method object (config, roles, etc.)
+
+**BREAKING CHANGES:**
+* Only supports Vault v1.9 or greater
+
 ## 0.5.0
 IMPROVEMENTS:
 * Added concurrency for all audit devices, auth methods, secrets engines, and policies

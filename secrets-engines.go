@@ -124,8 +124,7 @@ func CleanupSecretsEngines(secretsEnginesList SecretsEnginesList) {
 	for mountPath, mountOutput := range existing_mounts {
 
 		// Ignore default mounts
-		// generic = old kv store
-		if !(mountOutput.Type == "system" || mountOutput.Type == "cubbyhole" || mountOutput.Type == "identity" || mountOutput.Type == "kv" || mountOutput.Type == "generic") {
+		if !(mountOutput.Type == "system" || mountOutput.Type == "cubbyhole" || mountOutput.Type == "identity") {
 			if _, ok := secretsEnginesList[mountPath]; ok {
 				log.Debug("Secrets engine [" + mountPath + "] exists in configuration, no cleanup necessary")
 			} else {

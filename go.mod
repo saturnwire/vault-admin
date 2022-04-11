@@ -1,6 +1,6 @@
 module github.com/PremiereGlobal/vault-admin
 
-go 1.17
+go 1.18
 
 require (
 	github.com/hashicorp/go-sockaddr v1.0.2

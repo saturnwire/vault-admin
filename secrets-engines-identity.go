@@ -109,7 +109,8 @@ func (ident *IdentitySecretsEngine) processEntities() {
 
 	files, err := ioutil.ReadDir(path.Join(Spec.ConfigurationPath, "secrets-engines", ident.MountPath, "entities"))
 	if err != nil {
-		log.Fatalf("Error reading identity entity configurations: %v", err)
+		log.Warnf("Error reading identity entity configurations: %v", err)
+		return
 	}
 
 	for _, file := range files {
