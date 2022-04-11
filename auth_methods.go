@@ -114,28 +114,6 @@ func configureAuthMethods(authMethodList authMethodList) {
 
 		// Write the auth configuration (if set)
 		if mount.Config != nil {
-
-			// Here we transform to json in order to do string substitution
-			// jsondata, err := json.Marshal(mount.Config)
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
-			// contentstring := string(jsondata)
-			// err = performSubstitutions(&contentstring, "auth_methods/"+mount.Name)
-			// if err != nil {
-			// 	log.Warn(err)
-			// 	log.Warnf("Secret substitution failed for [%s], skipping auth method configuration", mount.Path)
-			// 	return
-			// } else {
-			// 	if !isJSON(contentstring) {
-			// 		log.Fatalf("Auth engine [%s] is not a valid JSON after secret substitution", mount.Path)
-			// 	}
-
-			// 	var configMap map[string]interface{}
-			// 	if err := json.Unmarshal([]byte(contentstring), &configMap); err != nil {
-			// 		log.Fatalf("Auth engine [%s] failed to unmarshall after secret substitution", mount.Path)
-			// 	}
-
 			configPath := path.Join("auth", mount.Path, "config")
 			task := taskWrite{
 				Path:        configPath,
@@ -144,7 +122,6 @@ func configureAuthMethods(authMethodList authMethodList) {
 			}
 			wg.Add(1)
 			taskChan <- task
-			// }
 		}
 
 		if mount.AuthOptions.Type == "userpass" {
