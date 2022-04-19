@@ -1,3 +1,13 @@
+## 0.6.0 
+
+IMPROVEMENTS:
+* Now supports secret substitution for entire auth_method object (config, roles, etc.)
+* Now supports kv v2 secret store for substitution
+* Will now manage `kv` secret engines.  This will prompt to delete existing kv stores if not defined.
+
+**BREAKING CHANGES:**
+* Only supports Vault v1.9 or greater
+
 ## 0.5.0
 IMPROVEMENTS:
 * Added concurrency for all audit devices, auth methods, secrets engines, and policies

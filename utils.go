@@ -14,6 +14,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	ErrNotExist = errors.New("secret does not exist")
+)
+
 func getJsonFile(path string) (bool, string) {
 	if checkExt(path, ".json") {
 		content, err := ioutil.ReadFile(path)
@@ -32,30 +36,68 @@ func getJsonFile(path string) (bool, string) {
 	}
 }
 
-func getSecretArray(path string) (bool, map[string]string) {
+func getSecretArray(path string) (map[string]string, error) {
 
 	secretArray := make(map[string]string)
+
+	kvVersion, err := kvVersionByPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if kvVersion == 2 {
+		pathParts := strings.Split(path, "/")
+		pathParts = SliceInsert(pathParts, 1, "data")
+		path = strings.Join(pathParts, "/")
+	}
 
 	// Read secrets from Vault for substitution
 	secret, err := Vault.Read(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	if secret != nil {
+
+		if len(secret.Warnings) > 0 {
+			for _, v := range secret.Warnings {
+				log.Warnf("Read secret warning: %s", v)
+			}
+		}
+
 		for k, v := range secret.Data {
+
 			switch value := v.(type) {
+			// v1
 			case string:
 				secretArray[k] = value
+			// v2
+			case map[string]interface{}:
+				if k == "data" {
+					for x, y := range value {
+						if data, ok := y.(string); ok {
+							secretArray[x] = data
+						}
+					}
+				}
 			default:
 				log.Fatal("Issue parsing Vault secret [" + path + "]")
 			}
 		}
 	} else {
-		return false, nil
+		return nil, ErrNotExist
 	}
 
-	return true, secretArray
+	return secretArray, nil
+}
+
+func SliceInsert[V any](a []V, index int, value V) []V {
+	if len(a) == index { // nil or empty slice or after last element
+		return append(a, value)
+	}
+	a = append(a[:index+1], a[index:]...) // index < len(a)
+	a[index] = value
+	return a
 }
 
 // GetSecretListKeyInfo takes a path and performs a LIST operation on it
@@ -131,15 +173,21 @@ func getSecretList(path string) SecretList {
 	return secretList
 }
 
-func performSubstitutions(content *string, secretPath string) (bool, string) {
+func performSubstitutions(content *string, secretPath string) error {
 
 	var secrets map[string]string
-	success, secrets := getSecretArray(Spec.VaultSecretBasePath + secretPath)
+	fullSecretPath := Spec.VaultSecretBasePath + secretPath
+	secrets, err := getSecretArray(fullSecretPath)
 
-	if success {
-		for k, v := range secrets {
-			*content = strings.Replace(*content, "%{"+k+"}%", v, -1)
+	if err != nil {
+		if errors.Is(err, ErrNotExist) {
+			secrets = make(map[string]string)
+		} else {
+			return err
 		}
+	}
+	for k, v := range secrets {
+		*content = strings.Replace(*content, "%{"+k+"}%", v, -1)
 	}
 
 	// Ensure all the variables were substituted
@@ -150,10 +198,36 @@ func performSubstitutions(content *string, secretPath string) (bool, string) {
 		for _, match := range matches {
 			matchArray = append(matchArray, match[0])
 		}
-		return false, fmt.Sprintf("The following substitutions were detected but not found in Vault path ["+secretPath+"]: %v", strings.Join(matchArray, ", "))
+		return fmt.Errorf("The following substitutions were detected but not found in Vault path ["+fullSecretPath+"]: %v", strings.Join(matchArray, ", "))
 	}
 
-	return true, ""
+	return nil
+}
+
+// Determines the version of a KV store by path
+// Returns version of the kv store or
+// returns 0 with error if error
+func kvVersionByPath(path string) (int, error) {
+
+	mounts, err := VaultSys.ListMounts()
+	if err != nil {
+		log.Fatalf("Failed to list mounts: %v", err)
+	}
+
+	pathParts := strings.Split(path, "/")
+	if mount, ok := mounts[pathParts[0]+"/"]; ok {
+		if mount.Type != "kv" {
+			return 0, fmt.Errorf("cannot determine kv version; mountpoint '%s' is not a kv secret backend", pathParts[0]+"/")
+		} else if mount.Options == nil {
+			return 1, nil
+		} else if mount.Options["version"] == "2" {
+			return 2, nil
+		} else {
+			return 1, nil
+		}
+	} else {
+		return 0, fmt.Errorf("cannot determine kv version; mountpoint '%s' not found", pathParts[0]+"/")
+	}
 }
 
 func checkExt(filename string, ext string) bool {

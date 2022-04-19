@@ -54,9 +54,9 @@ func ConfigureAwsSecretsEngine(secretsEngine SecretsEngine) {
 
 	// Perform any substitutions
 	contentstring := string(content)
-	success, errMsg := performSubstitutions(&contentstring, "secrets-engines/"+secretsEngine.Name)
-	if !success {
-		log.Warn(errMsg)
+	err = performSubstitutions(&contentstring, "secrets-engines/"+secretsEngine.Name)
+	if err != nil {
+		log.Warn(err)
 		log.Warn("Secret substitution failed for [" + Spec.ConfigurationPath + "secrets-engines/" + secretsEngine.Path + "aws.json" + "], skipping secret engine [" + secretsEngine.Path + "]")
 		return
 	}
