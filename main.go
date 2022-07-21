@@ -20,7 +20,7 @@ type Specification struct {
 	VaultToken          string `envconfig:"VAULT_TOKEN" short:"t" long:"vault-token" description:"Vault token to use, otherwise will prompt for LDAP credentials"`
 	VaultSkipVerify     bool   `envconfig:"VAULT_SKIP_VERIFY" short:"K" long:"skip-verify" description:"Skip Vault TLS certificate verification"`
 	VaultSecretBasePath string `envconfig:"VAULT_SECRET_BASE_PATH" short:"s" long:"vault-secret-base-path" description:"Base secret path, in Vault, to pull secrets for substitution" vdefault:"secret/vault-admin/"`
-	RotateCreds         bool   `short:"r" long:"rotate-creds" description:"Rotates AWS root credentials" vdefault:"false"`
+	RotateCreds         bool   `short:"r" long:"rotate-creds" description:"Rotates AWS / GCP root credentials" vdefault:"false"`
 	Concurrency         string `short:"n" long:"concurrent" description:"Number of concurrent threads to run (default: 5)" vdefault:"5"`
 	Debug               bool   `envconfig:"DEBUG" short:"d" long:"debug" description:"Turn on debug logging"`
 	Version             bool   `short:"v" long:"version" description:"Display the version of the tool"`

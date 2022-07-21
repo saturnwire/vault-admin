@@ -1,0 +1,10 @@
+{
+  "root_config": {
+    "credentials": %{credentials}%
+  },
+  "overwrite_root_config": false,
+  "config_lease": {
+    "ttl": "1h",
+    "max_ttl": "720h"
+  }
+}

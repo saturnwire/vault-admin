@@ -1,0 +1,4 @@
+{
+  "type": "gcp",
+  "description": "Mount for GCP project secret backend"
+}

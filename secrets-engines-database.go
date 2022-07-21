@@ -29,7 +29,7 @@ func ConfigureDatabaseSecretsEngine(secretsEngine SecretsEngine) {
 	err = performSubstitutions(&contentstring, "secrets-engines/"+secretsEngine.Name)
 	if err != nil {
 		log.Warn(err)
-		log.Warn("Secret substitution failed for [" + Spec.ConfigurationPath + "secrets-engines/" + secretsEngine.Path + "aws.json" + "], skipping secret engine [" + secretsEngine.Path + "]")
+		log.Warn("Secret substitution failed for [" + Spec.ConfigurationPath + "secrets-engines/" + secretsEngine.Path + "db.json" + "], skipping secret engine [" + secretsEngine.Path + "]")
 		return
 	}
 
