@@ -16,5 +16,13 @@ func RotateCreds() {
 				log.Info("Rotated key for ["+path+"].  New access key: ", secret.Data["access_key"].(string))
 			}
 		}
+		if mount.Type == "gcp" {
+			secret, err := Vault.Write(path+"config/rotate-root", nil)
+			if err != nil {
+				log.Warn("Cannot rotate ["+path+"] ", err)
+			} else {
+				log.Info("Rotated key for ["+path+"].  New private key id: ", secret.Data["private_key_id"].(string))
+			}
+		}
 	}
 }

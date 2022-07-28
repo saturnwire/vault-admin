@@ -112,8 +112,11 @@ func ConfigureSecretsEngines(secretsEnginesList SecretsEnginesList) {
 		} else if secretsEngine.MountInput.Type == "database" {
 			log.Info("Configuring database backend ", secretsEngine.Path)
 			ConfigureDatabaseSecretsEngine(secretsEngine)
+		} else if secretsEngine.MountInput.Type == "gcp" {
+			log.Info("Configuring GCP backend ", secretsEngine.Path)
+			ConfigureGcpSecretsEngine(secretsEngine)
 		} else if secretsEngine.MountInput.Type != "kv" {
-			log.Warn(`Secrets engine type [%s] supported, please open PR!`, secretsEngine.MountInput.Type)
+			log.Warnf("Secrets engine type [%s] unsupported, please open PR!", secretsEngine.MountInput.Type)
 		}
 	}
 }

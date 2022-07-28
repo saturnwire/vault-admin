@@ -1,0 +1,18 @@
+{
+  "project": "project-one",
+  "secret_type": "service_account_key",
+  "bindings": [
+    {
+      "resource": "//cloudresourcemanager.googleapis.com/projects/project-one",
+      "roles": [
+        "roles/viewer"
+      ]
+    },
+    {
+      "resource": "//cloudresourcemanager.googleapis.com/projects/project-two",
+      "roles": [
+        "roles/viewer"
+      ]
+    }
+  ]
+}

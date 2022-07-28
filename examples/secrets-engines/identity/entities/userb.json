@@ -12,14 +12,6 @@
     {
       "name": "userb",
       "mount_path": "userpass/"
-    },
-    {
-      "name": "userb1",
-      "mount_path": "userpass/"
-    },
-    {
-      "name": "userb2",
-      "mount_path": "userpass/"
     }
   ],
   "entity-groups": [
